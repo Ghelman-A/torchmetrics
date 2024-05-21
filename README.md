@@ -59,7 +59,7 @@ Pip from source
 
 ```bash
 # with git
-pip install git+https://github.com/Lightning-AI/torchmetrics.git@release/stable
+pip install git+https://github.com/Ghelman-A/torchmetrics.git@release/stable
 ```
 
 Pip from archive
