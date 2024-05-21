@@ -559,6 +559,8 @@ class MeanAveragePrecision(Metric):
                         coco_eval.params.maxDets = self.max_detection_thresholds
 
                     map_per_class_list = []
+                    map_50_per_class_list = []
+                    map_75_per_class_list = []
                     mar_per_class_list = []
                     for class_id in self._get_classes():
                         coco_eval.params.catIds = [class_id]
@@ -569,17 +571,25 @@ class MeanAveragePrecision(Metric):
                             class_stats = coco_eval.stats
 
                         map_per_class_list.append(torch.tensor([class_stats[0]]))
+                        map_50_per_class_list.append(torch.tensor([class_stats[1]]))
+                        map_75_per_class_list.append(torch.tensor([class_stats[2]]))
                         mar_per_class_list.append(torch.tensor([class_stats[8]]))
 
                     map_per_class_values = torch.tensor(map_per_class_list, dtype=torch.float32)
+                    map_50_per_class_values = torch.tensor(map_50_per_class_list, dtype=torch.float32)
+                    map_75_per_class_values = torch.tensor(map_75_per_class_list, dtype=torch.float32)
                     mar_per_class_values = torch.tensor(mar_per_class_list, dtype=torch.float32)
                 else:
                     map_per_class_values = torch.tensor([-1], dtype=torch.float32)
+                    map_50_per_class_values = torch.tensor([-1], dtype=torch.float32)
+                    map_75_per_class_values = torch.tensor([-1], dtype=torch.float32)
                     mar_per_class_values = torch.tensor([-1], dtype=torch.float32)
                 prefix = "" if len(self.iou_type) == 1 else f"{i_type}_"
                 result_dict.update(
                     {
                         f"{prefix}map_per_class": map_per_class_values,
+                        f"{prefix}map_50_per_class": map_50_per_class_values,
+                        f"{prefix}map_75_per_class": map_75_per_class_values,
                         f"{prefix}mar_{self.max_detection_thresholds[-1]}_per_class": mar_per_class_values,
                     },
                 )
