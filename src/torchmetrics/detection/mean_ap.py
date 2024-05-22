@@ -562,6 +562,8 @@ class MeanAveragePrecision(Metric):
                     map_50_per_class_list = []
                     map_75_per_class_list = []
                     mar_per_class_list = []
+                    all_map_list = [[] for _ in self.iou_thresholds]
+
                     for class_id in self._get_classes():
                         coco_eval.params.catIds = [class_id]
                         with contextlib.redirect_stdout(io.StringIO()):
@@ -575,15 +577,21 @@ class MeanAveragePrecision(Metric):
                         map_75_per_class_list.append(torch.tensor([class_stats[2]]))
                         mar_per_class_list.append(torch.tensor([class_stats[8]]))
 
+                        for i in range(len(self.iou_thresholds)):
+                            all_map_list[i].append(torch.tensor(class_stats[12+i]))
+
                     map_per_class_values = torch.tensor(map_per_class_list, dtype=torch.float32)
                     map_50_per_class_values = torch.tensor(map_50_per_class_list, dtype=torch.float32)
                     map_75_per_class_values = torch.tensor(map_75_per_class_list, dtype=torch.float32)
                     mar_per_class_values = torch.tensor(mar_per_class_list, dtype=torch.float32)
+                    all_map_values = [torch.tensor(map_list, dtype=torch.float32) for map_list in all_map_list]
                 else:
                     map_per_class_values = torch.tensor([-1], dtype=torch.float32)
                     map_50_per_class_values = torch.tensor([-1], dtype=torch.float32)
                     map_75_per_class_values = torch.tensor([-1], dtype=torch.float32)
                     mar_per_class_values = torch.tensor([-1], dtype=torch.float32)
+                    all_map_values = -torch.ones(shape=(len(self.iou_thresholds),), dtype=torch.float32)
+
                 prefix = "" if len(self.iou_type) == 1 else f"{i_type}_"
                 result_dict.update(
                     {
@@ -593,6 +601,9 @@ class MeanAveragePrecision(Metric):
                         f"{prefix}mar_{self.max_detection_thresholds[-1]}_per_class": mar_per_class_values,
                     },
                 )
+                for idx, thr in self.iou_thresholds:
+                    result_dict[f"{prefix}map_{thr}_per_class"] = all_map_values[idx
+                    ]
         result_dict.update({"classes": torch.tensor(self._get_classes(), dtype=torch.int32)})
 
         return result_dict
