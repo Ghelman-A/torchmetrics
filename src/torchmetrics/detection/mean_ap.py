@@ -647,7 +647,7 @@ class MeanAveragePrecision(Metric):
             f"{prefix}mar_large": torch.tensor([stats[11]], dtype=torch.float32),
         }
         for idx, thr in enumerate(self.iou_thresholds):
-            outstats[f"{prefix}map_{thr}"] = torch.tensor([stats[12 + idx]], dtype=torch.float32),
+            outstats[f"{prefix}map_{thr}"] = torch.tensor([stats[12 + idx]], dtype=torch.float32)
 
         return outstats
 
