@@ -632,7 +632,7 @@ class MeanAveragePrecision(Metric):
     def _coco_stats_to_tensor_dict(self, stats: List[float], prefix: str) -> Dict[str, Tensor]:
         """Converts the output of COCOeval.stats to a dict of tensors."""
         mdt = self.max_detection_thresholds
-        return {
+        outstats = {
             f"{prefix}map": torch.tensor([stats[0]], dtype=torch.float32),
             f"{prefix}map_50": torch.tensor([stats[1]], dtype=torch.float32),
             f"{prefix}map_75": torch.tensor([stats[2]], dtype=torch.float32),
@@ -646,6 +646,10 @@ class MeanAveragePrecision(Metric):
             f"{prefix}mar_medium": torch.tensor([stats[10]], dtype=torch.float32),
             f"{prefix}mar_large": torch.tensor([stats[11]], dtype=torch.float32),
         }
+        for idx, thr in enumerate(self.iou_thresholds):
+            outstats[f"{prefix}map_{thr}"] = torch.tensor([stats[12 + idx]], dtype=torch.float32),
+
+        return outstats
 
     @staticmethod
     def coco_to_tm(
