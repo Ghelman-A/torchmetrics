@@ -601,7 +601,7 @@ class MeanAveragePrecision(Metric):
                         f"{prefix}mar_{self.max_detection_thresholds[-1]}_per_class": mar_per_class_values,
                     },
                 )
-                for idx, thr in self.iou_thresholds:
+                for idx, thr in enumerate(self.iou_thresholds):
                     result_dict[f"{prefix}map_{thr}_per_class"] = all_map_values[idx
                     ]
         result_dict.update({"classes": torch.tensor(self._get_classes(), dtype=torch.int32)})
